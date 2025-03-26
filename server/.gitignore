@@ -1,0 +1,15 @@
+# Node.js
+node_modules/
+.env
+npm-debug.log
+yarn-error.log
+logs/
+.DS_Store
+
+# Compiled/Output (if using TypeScript, etc.)
+dist/
+*.tsbuildinfo
+
+# Database/files (if applicable)
+*.sqlite
+*.db
