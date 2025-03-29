@@ -120,3 +120,17 @@ app.put('/shorten/:shortCode', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+app.delete('/shorten/:shortCode', async (req, res) => {
+  try {
+    const url = await Url.findOneAndDelete({ shortCode: req.params.shortCode });
+
+    if (url) {
+      res.status(204).end();
+    } else {
+      res.status(404).json({ error: 'URL not found' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
