@@ -75,3 +75,24 @@ app.get('/:shortCode', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+app.get('/shorten/:shortCode', async (req, res) => {
+  try {
+    const url = await Url.findOne({ shortCode: req.params.shortCode });
+
+    if (url) {
+      res.json({
+        id: url._id,
+        url: url.originalUrl,
+        shortCode: url.shortCode,
+        createdAt: url.createdAt,
+        updatedAt: url.updatedAt,
+        accessCount: url.accessCount
+      });
+    } else {
+      res.status(404).json({ error: 'URL not found' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
