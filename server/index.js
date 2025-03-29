@@ -57,3 +57,21 @@ app.post('/shorten', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+app.get('/:shortCode', async (req, res) => {
+  try {
+    const url = await Url.findOneAndUpdate(
+      { shortCode: req.params.shortCode },
+      { $inc: { accessCount: 1 } },
+      { new: true }
+    );
+
+    if (url) {
+      res.redirect(302, url.originalUrl);
+    } else {
+      res.status(404).json({ error: 'URL not found' });
+    }
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
