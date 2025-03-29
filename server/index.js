@@ -1,5 +1,9 @@
 const express = require("express");
 const mongoose = require('mongoose');
+const dotenv = require("dotenv");
+const shortid = require('shortid'); 
+dotenv.config({ path: "./config.env" });
+const cors = require('cors');
 const app = express();
 
 app.get("/", (req, res) => {
@@ -9,9 +13,8 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-mongoose.connect('mongodb://localhost:27017/urlshortener', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
+mongoose.connect(process.env.CONN_STR).then(() => {
+  console.log("DB Connected Successfully");
 });
 
 const urlSchema = new mongoose.Schema({
@@ -23,3 +26,34 @@ const urlSchema = new mongoose.Schema({
 });
 
 const Url = mongoose.model('Url', urlSchema);
+
+app.use(express.json());
+app.use(cors());
+
+app.post('/shorten', async (req, res) => {
+  const { url } = req.body;
+  
+  if (!url) {
+    return res.status(400).json({ error: 'URL is required' });
+  }
+
+  try {
+    const shortCode = shortid.generate();
+    const newUrl = new Url({
+      originalUrl: url,
+      shortCode
+    });
+
+    await newUrl.save();
+    
+    res.status(201).json({
+      id: newUrl._id,
+      url: newUrl.originalUrl,
+      shortCode: newUrl.shortCode,
+      createdAt: newUrl.createdAt,
+      updatedAt: newUrl.updatedAt
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
