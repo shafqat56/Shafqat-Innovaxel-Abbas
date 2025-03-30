@@ -1,0 +1,16 @@
+# Root-level ignores (applies to entire repo)
+.DS_Store
+*.log
+.env
+.idea/
+.vscode/
+
+# Client-specific ignores
+client/node_modules/
+client/.env
+client/dist/
+
+# Server-specific ignores
+server/node_modules/
+server/.env
+server/*.log
