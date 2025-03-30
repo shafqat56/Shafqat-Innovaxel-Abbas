@@ -6,6 +6,15 @@ dotenv.config({ path: "./config.env" });
 const cors = require('cors');
 const app = express();
 
+const isValidUrl = (url) => {
+  try {
+    const newUrl = new URL(url);
+    return ['http:', 'https:'].includes(newUrl.protocol);
+  } catch (err) {
+    return false;
+  }
+};
+
 app.get("/", (req, res) => {
   res.send("URL Shortener API");
 });
@@ -33,8 +42,8 @@ app.use(cors());
 app.post('/shorten', async (req, res) => {
   const { url } = req.body;
   
-  if (!url) {
-    return res.status(400).json({ error: 'URL is required' });
+  if (!url || !isValidUrl(url)) {
+    return res.status(400).json({ error: 'Invalid URL. Please Provide a Valid URL' });
   }
 
   try {
@@ -100,8 +109,8 @@ app.get('/shorten/:shortCode', async (req, res) => {
 app.put('/shorten/:shortCode', async (req, res) => {
   const { url: newUrl } = req.body;
   
-  if (!newUrl) {
-    return res.status(400).json({ error: 'URL is required' });
+  if (!newUrl || !isValidUrl(newUrl)) {
+    return res.status(400).json({ error: 'Invalid URL. Please Provide a Valid URL' });
   }
 
   try {
