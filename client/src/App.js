@@ -5,9 +5,13 @@ function App() {
   const [originalUrl, setOriginalUrl] = useState('');
   const [shortUrl, setShortUrl] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError('');
+    
     try {
       const response = await fetch('http://localhost:5000/shorten', {
         method: 'POST',
@@ -24,9 +28,10 @@ function App() {
 
       const data = await response.json();
       setShortUrl(`http://localhost:5000/${data.shortCode}`);
-      setError('');
     } catch (err) {
       setError(err.message || 'Error shortening URL');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -43,10 +48,13 @@ function App() {
             placeholder="Enter URL to shorten"
             required
           />
-          <button type="submit">Shorten</button>
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? 'Shortening...' : 'Shorten'}
+          </button>
         </form>
         
         {error && <p className="error">{error}</p>}
+        {isLoading && <p>Loading...</p>}
         {shortUrl && (
           <div className="result">
             <p>Short URL: <a href={shortUrl}>{shortUrl}</a></p>
